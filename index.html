@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -28,11 +28,16 @@
             <a href="#projects" class="nav-link">Projects</a>
             <a href="#contact" class="nav-link">Contact</a>
         </nav>
-        <button class="mobile-menu-btn" aria-label="Toggle Menu">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </button>
+        <div class="nav-controls" style="display: flex; align-items: center; gap: 1rem;">
+            <button class="terminal-toggle-btn" aria-label="Hacker Mode" title="Hacker Mode">
+                >_ Terminal
+            </button>
+            <button class="mobile-menu-btn" aria-label="Toggle Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
     </header>
 
     <!-- Main Content -->
@@ -122,8 +127,20 @@
                 <div class="title-underline"></div>
             </div>
             <div class="projects-grid">
+                <!-- Mini Game Hub Project -->
+                <div class="project-card plate-glass reveal stagger-1" onclick="window.open('game_pro/index.html', '_blank')" style="cursor: pointer;">
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="tag">JavaScript</span>
+                            <span class="tag">HTML/CSS</span>
+                            <span class="tag">Games</span>
+                        </div>
+                        <h3 class="project-title">Interactive Mini Games Hub</h3>
+                        <p class="project-desc">A fun, interactive hub featuring seven custom-built mini-games with dynamic sound effects, neo-brutalist design, and smooth animations.</p>
+                    </div>
+                </div>
                 <!-- Project 1 -->
-                <div class="project-card plate-glass reveal stagger-1">
+                <div class="project-card plate-glass reveal stagger-2">
                     <div class="project-content">
                         <div class="project-tags">
                             <span class="tag">Python</span>
@@ -134,7 +151,7 @@
                     </div>
                 </div>
                 <!-- Project 2 -->
-                <div class="project-card plate-glass reveal stagger-2">
+                <div class="project-card plate-glass reveal stagger-3">
                     <div class="project-content">
                         <div class="project-tags">
                             <span class="tag">Arduino</span>
@@ -145,7 +162,7 @@
                     </div>
                 </div>
                 <!-- Project 3 -->
-                <div class="project-card plate-glass reveal stagger-3">
+                <div class="project-card plate-glass reveal stagger-4">
                     <div class="project-content">
                         <div class="project-tags">
                             <span class="tag">Web</span>
@@ -156,7 +173,7 @@
                     </div>
                 </div>
                 <!-- Project 4 -->
-                <div class="project-card plate-glass reveal stagger-4">
+                <div class="project-card plate-glass reveal stagger-5">
                     <div class="project-content">
                         <div class="project-tags">
                             <span class="tag">Python</span>
@@ -187,9 +204,63 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2026 Amal R. Built with modern web technologies.</p>
+        <p>&copy; 2026 Amal R. Crafted with code & creativity.</p>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- Floating Bored Button -->
+    <a href="game_pro/index.html" target="_blank" class="btn-bored float-btn-anim">
+        Bored? Click Here 😴
+    </a>
+
+    <!-- Terminal Overlay (Hacker Mode) -->
+    <div class="terminal-overlay" id="terminal-overlay">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <span class="dot close-dot" id="terminal-close-dot"></span>
+                    <span class="dot min-dot"></span>
+                    <span class="dot max-dot"></span>
+                </div>
+                <div class="terminal-title">guest@amal-portfolio:~</div>
+            </div>
+            <div class="terminal-body" id="terminal-body">
+                <div class="terminal-line">Welcome to Hacker Mode v1.0.0</div>
+                <div class="terminal-line">Type <span class="term-highlight">'help'</span> to see available commands.</div>
+            </div>
+            <div class="terminal-input-container">
+                <span class="terminal-prompt">guest@amal-portfolio:~$</span>
+                <input type="text" id="terminal-input" class="terminal-input" autofocus autocomplete="off">
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Robot -->
+    <div class="bot-container" id="interactive-bot">
+        <div class="bot-antenna">
+            <div class="bot-antenna-ball"></div>
+            <div class="bot-antenna-stick"></div>
+        </div>
+        <div class="bot-head">
+            <div class="bot-screen">
+                <div class="bot-eyes">
+                    <div class="bot-eye-wrapper">
+                        <div class="bot-eye"><div class="bot-pupil"></div></div>
+                    </div>
+                    <div class="bot-eye-wrapper">
+                        <div class="bot-eye"><div class="bot-pupil"></div></div>
+                    </div>
+                </div>
+                <div class="bot-mouth"></div>
+            </div>
+        </div>
+        <div class="bot-body">
+            <div class="bot-screen-mini"></div>
+        </div>
+        <div class="bot-arm arm-left"></div>
+        <div class="bot-arm arm-right"></div>
+        <div class="bot-shadow"></div>
+    </div>
+
+    <script src="script.js?v=2"></script>
 </body>
 </html>
