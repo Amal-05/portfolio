@@ -214,6 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         case 'clear':
                             terminalBody.innerHTML = '';
                             break;
+                        case 'hello bot':
+                            printLine("Hello there! I'm watching you... 👀");
+                            printLine("Just kidding! (Maybe.)");
+                            break;
+                        case 'story':
+                            printLine("Starting Story Mode...");
+                            if(window.botSpeak) window.botSpeak("Started with C -> moved to Python -> built AI projects -> now building full systems 🚀", 6000, true);
+                            break;
                         case 'exit':
                             printLine("Terminating session...");
                             setTimeout(closeTerminal, 500);
@@ -240,56 +248,218 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (botContainer && eyeWrappers.length > 0) {
         const botPupils = document.querySelectorAll('.bot-pupil');
+        const botHead = document.querySelector('.bot-head');
+        const botBubble = document.getElementById('bot-bubble');
+        const botBubbleContent = document.getElementById('bot-bubble-content');
+        
+        // --- Core Speaking System ---
+        let isBotSpeaking = false;
+        let botSpeakTimeout = null;
 
+        const botSpeak = window.botSpeak = function(message, duration = 4000, force = false) {
+            if (!botBubble || !botBubbleContent) return;
+            if (isBotSpeaking && !force) return;
+
+            isBotSpeaking = true;
+            botBubbleContent.innerHTML = message;
+            botBubble.classList.add('show');
+
+            clearTimeout(botSpeakTimeout);
+            botSpeakTimeout = setTimeout(() => {
+                botBubble.classList.remove('show');
+                setTimeout(() => { isBotSpeaking = false; }, 300);
+            }, duration);
+        };
+
+        const hideBotSpeak = window.hideBotSpeak = function() {
+            clearTimeout(botSpeakTimeout);
+            if (botBubble) botBubble.classList.remove('show');
+            isBotSpeaking = false;
+        };
+
+        // --- Bot Toggle Logic ---
+        const botToggleBtn = document.getElementById('bot-toggle-btn');
+        let isBotActive = true;
+
+        if (botToggleBtn) {
+            botToggleBtn.addEventListener('click', () => {
+                isBotActive = !isBotActive;
+                if (isBotActive) {
+                    botContainer.classList.remove('hidden');
+                    botToggleBtn.classList.remove('inactive');
+                    botToggleBtn.innerHTML = '🤖 Hide Bot';
+                    setTimeout(() => botSpeak('I\'m back! 👋', 3000, true), 400); // Wait for transition
+                } else {
+                    botContainer.classList.add('hidden');
+                    botToggleBtn.classList.add('inactive');
+                    botToggleBtn.innerHTML = '🤖 Show Bot';
+                    hideBotSpeak();
+                }
+            });
+        }
+
+        // --- Random Events (Waving & Funny Stuff) ---
+        setInterval(() => {
+            if (!isBotSpeaking && Math.random() > 0.6) {
+                const jokes = [
+                    "Hello there! 👋",
+                    "Do robots dream of electric sheep? 🐑",
+                    "I'm fueled by coffee and bugs 🐛",
+                    "Why do programmers prefer dark mode? Because light attracts bugs. 😂",
+                    "Still here? I'm watching you... 👀",
+                    "404: Sleep not found ☕"
+                ];
+                const msg = jokes[Math.floor(Math.random() * jokes.length)];
+                botSpeak(msg, 5000);
+                
+                if (msg.includes("Hello")) {
+                    const armRight = document.querySelector('.arm-right');
+                    if (armRight) {
+                        armRight.classList.add('waving');
+                        setTimeout(() => armRight.classList.remove('waving'), 2000);
+                    }
+                }
+            }
+        }, 20000);
+
+        // --- Mouse Tracking ---
         document.addEventListener('mousemove', (e) => {
             if (!botContainer) return;
             
-            // Get bot center coordinates safely
             const botRect = botContainer.getBoundingClientRect();
             const botX = botRect.left + botRect.width / 2;
             const botY = botRect.top + botRect.height / 2;
 
-            // Calculate angle and distance
             const dx = e.clientX - botX;
             const dy = e.clientY - botY;
             const angle = Math.atan2(dy, dx);
             
-            // Calculate a factor that reaches 1 when mouse is 300px away
             const dist = Math.hypot(dx, dy);
             const factor = Math.min(dist / 300, 1);
             
-            // Move the pupil slightly more inside the eye (max 8px for stronger tracking)
             const pupilDist = factor * 8;
             const pupilX = Math.cos(angle) * pupilDist;
             const pupilY = Math.sin(angle) * pupilDist;
 
-            // KEEP ONLY pupil movement
             botPupils.forEach(pupil => {
                 pupil.style.transform = `translate(calc(-50% + ${pupilX}px), calc(-50% + ${pupilY}px))`;
             });
         });
 
-        // Click interactions
-        botContainer.addEventListener('mousedown', () => {
-            botContainer.classList.add('surprised');
-        });
+        // --- Click Interactions & Easter Egg ---
+        let clickCount = 0;
+        let clickTimeout = null;
 
-        botContainer.addEventListener('mouseup', () => {
-            botContainer.classList.remove('surprised');
-        });
-
-        botContainer.addEventListener('mouseleave', () => {
-            botContainer.classList.remove('surprised');
-        });
-        
-        // Touch interactions for mobile
+        botContainer.addEventListener('mousedown', () => { botContainer.classList.add('surprised'); });
+        botContainer.addEventListener('mouseup', () => { botContainer.classList.remove('surprised'); });
+        botContainer.addEventListener('mouseleave', () => { botContainer.classList.remove('surprised'); });
         botContainer.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // prevent default click to handle manually
             botContainer.classList.add('surprised');
+        }, {passive: true});
+        botContainer.addEventListener('touchend', () => { botContainer.classList.remove('surprised'); });
+
+        botContainer.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimeout);
+            clickTimeout = setTimeout(() => { clickCount = 0; }, 2000);
+
+            if (clickCount === 5) {
+                botSpeak('Initiating Hacker Mode 2.0... just kidding 😂', 4000, true);
+                botContainer.style.transition = 'filter 0.5s';
+                botContainer.style.filter = 'hue-rotate(90deg) drop-shadow(0 0 20px #06b6d4)';
+                setTimeout(() => botContainer.style.filter = 'none', 4000);
+                clickCount = 0;
+            }
         });
+
+        // --- Smart Suggestions (Idle & Scroll) ---
+        let idleTimer = null;
+        const resetIdleTimer = () => {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                botSpeak('You look bored... try my games 😏<br><button onclick="window.open(\'game_pro/index.html\', \'_blank\')">Play Games</button>', 6000);
+            }, 5000);
+        };
         
-        botContainer.addEventListener('touchend', () => {
-            botContainer.classList.remove('surprised');
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('scroll', resetIdleTimer);
+        document.addEventListener('click', resetIdleTimer);
+        resetIdleTimer();
+
+        let lastScrollY = window.scrollY;
+        let lastScrollTime = Date.now();
+        document.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            const currentTime = Date.now();
+            const timeDiff = currentTime - lastScrollTime;
+            
+            if (timeDiff > 100) {
+                const speed = Math.abs(currentScrollY - lastScrollY) / timeDiff;
+                if (speed > 5) {
+                    botSpeak('Looking for something specific?');
+                }
+                lastScrollY = currentScrollY;
+                lastScrollTime = currentTime;
+            }
+        });
+
+        // --- Section Observers ---
+        const observerOptions = { threshold: 0.5 };
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.id === 'contact') {
+                        botSpeak('Want to hire me?<br><button onclick="document.querySelector(\'.contact-form input\').focus()">Contact Me</button>', 6000);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        const projectsSection = document.getElementById('projects');
+        const contactSection = document.getElementById('contact');
+        if (projectsSection) sectionObserver.observe(projectsSection);
+        if (contactSection) sectionObserver.observe(contactSection);
+
+        // --- Skill Hover Reactions ---
+        const skillCardsBot = document.querySelectorAll('.skill-card');
+        skillCardsBot.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const title = card.querySelector('.skill-name').innerText;
+                if (title.includes('C & Java')) {
+                    botSpeak('Ah, the classics! Where it all began ☕', 4000, true);
+                } else if (title.includes('Python')) {
+                    botSpeak('Python? My favorite language! 🐍', 4000, true);
+                } else if (title.includes('Arduino')) {
+                    botSpeak('I have some Arduino parts in me too! ⚙️', 4000, true);
+                } else if (title.includes('OpenCV')) {
+                    botSpeak('Computer Vision... I see everything! 👁️', 4000, true);
+                }
+            });
+            card.addEventListener('mouseleave', () => {
+                hideBotSpeak();
+            });
+        });
+
+        // --- Project Hover Reactions ---
+        const projectCards = document.querySelectorAll('.project-card');
+        projectCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const title = card.querySelector('.project-title').innerText;
+                if (title.includes('Mini Games')) {
+                    botSpeak('Built this entire games hub from scratch! 🎮', 4000, true);
+                } else if (title.includes('Attendance')) {
+                    botSpeak('This one uses OpenCV to detect faces 👀', 4000, true);
+                } else if (title.includes('Water Overflow')) {
+                    botSpeak('Real hardware system using Arduino 💧', 4000, true);
+                } else if (title.includes('Chatbot')) {
+                    botSpeak('A helpful digital assistant for students 🤖', 4000, true);
+                } else if (title.includes('Virtual Mouse')) {
+                    botSpeak('Control your mouse with just hand gestures! ✋', 4000, true);
+                }
+            });
+            card.addEventListener('mouseleave', () => {
+                hideBotSpeak();
+            });
         });
     }
 });
